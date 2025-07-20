@@ -1,11 +1,29 @@
 const UsersModel = require('../models/users.js');
 
-const CreateUser = (req, res)=>{
-    console.log(req.body);
-    res.json({
-        message: 'Create user success',
-        data: req.body
-    })
+const CreateUser = async (req, res)=>{
+    
+    if (!body.name || !body.email || !body.address) {
+        return res.status(400).json({
+            message: 'data tidak lengkap',
+            data: null
+        });
+    }
+
+    const {body} = req;
+
+    try {
+        await UsersModel.CreateUser(body);
+        res.status(201).json({
+            message: 'Create user success',
+            data: body
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            serverMessage: error,
+        })
+    }
+
 }
 
 const GetAllUsers = async (req, res)=>{
@@ -26,26 +44,41 @@ const GetAllUsers = async (req, res)=>{
 
 }
 
-const UpdateUser = (req, res)=>{
+const UpdateUser = async (req, res)=>{
     const {idUser} = req.params;
-    console.log('idUser : ', idUser);
-    res.json({
-        message: 'UPDATE users success',
-        data: req.body,
-    })
+    const {body} = req;
+
+    try {
+        await UsersModel.UpdateUser(body, idUser);
+        res.json({
+            message: 'UPDATE users success',
+            data: {
+                id: idUser,
+                ...body
+            },
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            serverMessage: error,
+        })
+    }
 }
 
-const DeleteUser = (req, res)=>{
+const DeleteUser = async(req, res)=>{
     const {idUser} = req.params; 
-    res.json({
-        message:'DELETE users success',
-        data:{
-            id: idUser,
-            name: 'jajang suyana',
-            email: 'suyajanang@gmail.com',
-            address:'tasikmalaya'
-        }
-    })
+    try {
+        await UsersModel.DeleteUser(idUser);
+        res.json({
+            message:'DELETE users success',
+            data: null
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            serverMessage: error,
+        })
+    }
 }
 
 module.exports = {
